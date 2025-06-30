@@ -2,18 +2,20 @@ import allure
 from allure_commons.types import Severity
 from selene import browser, be, have
 
+from github_tests.model.pages.application import app
+
 
 def test1_allure_not():
     search_test = "lenalenalena3/lesson2_python"
     issues = 'Issues 2406'
 
     browser.open('https://github.com')
-    browser.element('.search-input').should(be.visible).click()
-    browser.element('#query-builder-test').should(be.visible).send_keys(search_test).press_enter()
-    browser.element(f'a[href="/{search_test}"]').should(be.visible).click()
-    browser.element('#issues-tab').should(be.visible).click()
-    browser.element("#repository-input").should(have.value_containing("is:issue"))
-    browser.element(f'//a[.="{issues}"]').should(be.visible)
+    app.github_page.search_icon.should(be.visible).click()
+    app.github_page.search_input.should(be.visible).send_keys(search_test).press_enter()
+    app.github_page.search_result(search_test).should(be.visible).click()
+    app.github_page.issues_tab.should(be.visible).click()
+    app.github_page.issues_tab_input.should(have.value_containing("is:issue"))
+    app.github_page.issues_result(issues).should(be.visible)
 
 
 def test2_allure_with():
@@ -33,15 +35,15 @@ def test2_allure_with():
     with allure.step("Открываем главую страницу GitHub"):
         browser.open('https://github.com')
     with allure.step(f"Ищем репозиторий {search_test}"):
-        browser.element('.search-input').should(be.visible).click()
-        browser.element('#query-builder-test').should(be.visible).send_keys(search_test).press_enter()
+        app.github_page.search_icon.should(be.visible).click()
+        app.github_page.search_input.should(be.visible).send_keys(search_test).press_enter()
     with allure.step(f"Переходим по ссылке репозитория {search_test}"):
-        browser.element(f'a[href="/{search_test}"]').should(be.visible).click()
+        app.github_page.search_result(search_test).should(be.visible).click()
     with allure.step("Открываем вкладку Issue"):
-        browser.element('#issues-tab').should(be.visible).click()
-        browser.element("#repository-input").should(have.value_containing("is:issue"))
+        app.github_page.issues_tab.should(be.visible).click()
+        app.github_page.issues_tab_input.should(have.value_containing("is:issue"))
     with allure.step(f"На вкладке Issue проверяем, что есть {issues}"):
-        browser.element(f'//a[.="{issues}"]').should(be.visible)
+        app.github_page.issues_result(issues).should(be.visible)
 
 
 @allure.tag("web")
@@ -57,35 +59,8 @@ def test3_allure_step():
     search_test = "lenalenalena3/lesson2_python"
     issues = 'Issues 2406'
 
-    open_page()
-    search(search_test)
-    open_link(search_test)
-    open_issues()
-    should_issues(issues)
-
-
-@allure.step("Открываем главую страницу GitHub")
-def open_page():
-    browser.open('https://github.com')
-
-
-@allure.step("Ищем репозиторий {value}")
-def search(value):
-    browser.element('.search-input').should(be.visible).click()
-    browser.element('#query-builder-test').should(be.visible).send_keys(value).press_enter()
-
-
-@allure.step("Переходим по ссылке репозитория {value}")
-def open_link(value):
-    browser.element(f'a[href="/{value}"]').should(be.visible).click()
-
-
-@allure.step("Открываем вкладку Issue")
-def open_issues():
-    browser.element('#issues-tab').should(be.visible).click()
-    browser.element("#repository-input").should(have.value_containing("is:issue"))
-
-
-@allure.step("На вкладке Issue проверяем, что есть {value}")
-def should_issues(value):
-    browser.element(f'//a[.="{value}"]').should(be.visible)
+    app.github_page.open_github_page()
+    app.github_page.search(search_test)
+    app.github_page.open_link(search_test)
+    app.github_page.open_issues()
+    app.github_page.should_issues(issues)
